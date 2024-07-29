@@ -46,20 +46,27 @@ function AdminDashboard() {
                 ? 'http://coquifleurs.lespi.fr/api/update_product.php'
                 : 'http://coquifleurs.lespi.fr/api/add_product.php';
 
-            await fetch(url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(formData)
             });
-            fetchProducts();
-            setFormData({
-                name: '',
-                description: '',
-                price: '',
-                stock: '',
-                collection: '',
-                productId: '',
-            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                fetchProducts();
+                setFormData({
+                    name: '',
+                    description: '',
+                    price: '',
+                    stock: '',
+                    collection: '',
+                    productId: '',
+                });
+            } else {
+                console.error('Erreur:', result.message);
+            }
         } catch (error) {
             console.error('Erreur lors de l\'ajout ou de la mise à jour du produit:', error);
         }
@@ -97,11 +104,46 @@ function AdminDashboard() {
             {/* Formulaire pour ajouter ou modifier un produit */}
             <form onSubmit={handleSubmit}>
                 <h2>{formData.productId ? 'Modifier un produit' : 'Ajouter un produit'}</h2>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Nom" />
-                <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description"></textarea>
-                <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Prix" step="0.01" />
-                <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" />
-                <input type="text" name="collection" value={formData.collection} onChange={handleChange} placeholder="Collection" />
+                <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Nom"
+                    required
+                />
+                <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Description"
+                    required
+                ></textarea>
+                <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    placeholder="Prix"
+                    step="0.01"
+                    required
+                />
+                <input
+                    type="number"
+                    name="stock"
+                    value={formData.stock}
+                    onChange={handleChange}
+                    placeholder="Stock"
+                    required
+                />
+                <input
+                    type="text"
+                    name="collection"
+                    value={formData.collection}
+                    onChange={handleChange}
+                    placeholder="Collection"
+                    required
+                />
                 <button type="submit">{formData.productId ? 'Mettre à jour Produit' : 'Ajouter Produit'}</button>
             </form>
 
@@ -115,7 +157,14 @@ function AdminDashboard() {
                         <p>{product.price}€</p>
                         <p>Stock: {product.stock}</p>
                         <p>Collection: {product.collection}</p>
-                        <button onClick={() => setFormData({ ...product })}>Modifier</button>
+                        <button onClick={() => setFormData({
+                            name: product.name,
+                            description: product.description,
+                            price: product.price,
+                            stock: product.stock,
+                            collection: product.collection,
+                            productId: product.id
+                        })}>Modifier</button>
                         <button onClick={() => handleDelete(product.id)}>Supprimer</button>
                     </li>
                 ))}
