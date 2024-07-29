@@ -11,7 +11,7 @@ function AdminLogin() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://yourdomain.com/api/admin_login.php', {
+            const response = await axios.post('http://coquifleurs.lespi.fr/api/admin_login.php', {
                 username,
                 password
             });
