@@ -5,7 +5,7 @@ function ProductList() {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        fetch('http://coquifleurs.lespi.fr/get_products.php')
+        fetch('http://yourdomain.com/get_products.php')
             .then(response => response.json())
             .then(data => setProducts(data));
     }, []);
@@ -19,6 +19,7 @@ function ProductList() {
                         <h2>{product.name}</h2>
                         <p>{product.description}</p>
                         <p>{product.price}€</p>
+                        <p>Collection: {product.collection}</p> {/* Affichage de la collection */}
                     </li>
                 ))}
             </ul>
