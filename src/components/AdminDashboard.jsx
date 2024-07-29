@@ -41,8 +41,15 @@ function AdminDashboard() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Validation pour éviter l'envoi de données invalides
+        const { name, description, price, stock, collection, productId } = formData;
+        if (!name || !description || !price || !stock || !collection) {
+            alert('Tous les champs doivent être remplis.');
+            return;
+        }
+
         try {
-            const url = formData.productId
+            const url = productId
                 ? 'http://coquifleurs.lespi.fr/api/update_product.php'
                 : 'http://coquifleurs.lespi.fr/api/add_product.php';
 
