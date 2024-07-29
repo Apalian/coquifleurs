@@ -11,6 +11,7 @@ function AdminDashboard() {
         collection: '',
         productId: '',
     });
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -44,7 +45,7 @@ function AdminDashboard() {
         // Validation pour éviter l'envoi de données invalides
         const { name, description, price, stock, collection, productId } = formData;
         if (!name || !description || !price || !stock || !collection) {
-            alert('Tous les champs doivent être remplis.');
+            setError('Tous les champs doivent être remplis.');
             return;
         }
 
@@ -71,11 +72,13 @@ function AdminDashboard() {
                     collection: '',
                     productId: '',
                 });
+                setError('');
             } else {
-                console.error('Erreur:', result.message);
+                setError(result.message);
             }
         } catch (error) {
             console.error('Erreur lors de l\'ajout ou de la mise à jour du produit:', error);
+            setError('Erreur lors de l\'ajout ou de la mise à jour du produit.');
         }
     };
 
@@ -153,6 +156,9 @@ function AdminDashboard() {
                 />
                 <button type="submit">{formData.productId ? 'Mettre à jour Produit' : 'Ajouter Produit'}</button>
             </form>
+
+            {/* Message d'erreur */}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
 
             {/* Liste des produits */}
             <h2>Liste des produits</h2>
