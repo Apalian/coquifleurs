@@ -52,7 +52,6 @@ function AdminDashboard() {
                 body: new URLSearchParams(formData)
             });
             fetchProducts();
-            // Réinitialiser le formulaire après soumission
             setFormData({
                 name: '',
                 description: '',
@@ -76,6 +75,18 @@ function AdminDashboard() {
             fetchProducts();
         } catch (error) {
             console.error('Erreur lors de la suppression du produit:', error);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await fetch('http://coquifleurs.lespi.fr/api/logout.php', {
+                method: 'GET'
+            });
+            localStorage.removeItem('admin_logged_in');
+            navigate('/admin');
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion:', error);
         }
     };
 
@@ -111,7 +122,7 @@ function AdminDashboard() {
             </ul>
 
             {/* Déconnexion */}
-            <a href="/admin/logout">Déconnexion</a>
+            <button onClick={handleLogout}>Déconnexion</button>
         </div>
     );
 }
