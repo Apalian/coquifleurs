@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard() {
@@ -24,8 +23,9 @@ function AdminDashboard() {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get('http://coquifleurs.lespi.fr/api/get_products.php');
-            setProducts(response.data);
+            const response = await fetch('http://coquifleurs.lespi.fr/api/get_products.php');
+            const data = await response.json();
+            setProducts(data);
         } catch (error) {
             console.error('Erreur lors de la récupération des produits:', error);
         }
@@ -42,14 +42,25 @@ function AdminDashboard() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            if (formData.productId) {
-                // Mise à jour d'un produit
-                await axios.post('http://coquifleurs.lespi.fr/api/update_product.php', formData);
-            } else {
-                // Ajout d'un produit
-                await axios.post('http://coquifleurs.lespi.fr/api/add_product.php', formData);
-            }
+            const url = formData.productId
+                ? 'http://coquifleurs.lespi.fr/api/update_product.php'
+                : 'http://coquifleurs.lespi.fr/api/add_product.php';
+
+            await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData)
+            });
             fetchProducts();
+            // Réinitialiser le formulaire après soumission
+            setFormData({
+                name: '',
+                description: '',
+                price: '',
+                stock: '',
+                collection: '',
+                productId: '',
+            });
         } catch (error) {
             console.error('Erreur lors de l\'ajout ou de la mise à jour du produit:', error);
         }
@@ -57,7 +68,11 @@ function AdminDashboard() {
 
     const handleDelete = async (productId) => {
         try {
-            await axios.post('http://coquifleurs.lespi.fr/api/delete_product.php', { product_id: productId });
+            await fetch('http://coquifleurs.lespi.fr/api/delete_product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ product_id: productId })
+            });
             fetchProducts();
         } catch (error) {
             console.error('Erreur lors de la suppression du produit:', error);
