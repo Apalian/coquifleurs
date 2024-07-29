@@ -1,8 +1,9 @@
-
-// src/components/AdminDashboard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard() {
+    const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -11,6 +12,24 @@ function AdminDashboard() {
         collection: '',
         productId: '',
     });
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!localStorage.getItem('admin_logged_in')) {
+            navigate('/admin');
+        } else {
+            fetchProducts();
+        }
+    }, [navigate]);
+
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get('http://coquifleurs.lespi.fr/api/get_products.php');
+            setProducts(response.data);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des produits:', error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,44 +39,64 @@ function AdminDashboard() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        fetch('http://coquifleurs.lespi.fr/admin_dashboard.php', { method: 'POST', body: formData })
+        try {
+            if (formData.productId) {
+                // Mise à jour d'un produit
+                await axios.post('http://coquifleurs.lespi.fr/api/update_product.php', formData);
+            } else {
+                // Ajout d'un produit
+                await axios.post('http://coquifleurs.lespi.fr/api/add_product.php', formData);
+            }
+            fetchProducts();
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout ou de la mise à jour du produit:', error);
+        }
+    };
+
+    const handleDelete = async (productId) => {
+        try {
+            await axios.post('http://coquifleurs.lespi.fr/api/delete_product.php', { product_id: productId });
+            fetchProducts();
+        } catch (error) {
+            console.error('Erreur lors de la suppression du produit:', error);
+        }
     };
 
     return (
         <div>
-            <h1>Admin Dashboard</h1>
+            <h1>Tableau de Bord Administrateur</h1>
 
-            {/* Formulaire pour ajouter un produit */}
+            {/* Formulaire pour ajouter ou modifier un produit */}
             <form onSubmit={handleSubmit}>
-                <h2>Add Product</h2>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-                <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" required></textarea>
-                <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Price" step="0.01" required />
-                <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" required />
-                <input type="text" name="collection" value={formData.collection} onChange={handleChange} placeholder="Collection" />
-                <button type="submit">Add Product</button>
-            </form>
-
-            {/* Formulaire pour supprimer un produit */}
-            <form onSubmit={handleSubmit}>
-                <h2>Delete Product</h2>
-                <input type="number" name="productId" value={formData.productId} onChange={handleChange} placeholder="Product ID" required />
-                <button type="submit">Delete Product</button>
-            </form>
-
-            {/* Formulaire pour modifier un produit */}
-            <form onSubmit={handleSubmit}>
-                <h2>Update Product</h2>
-                <input type="number" name="productId" value={formData.productId} onChange={handleChange} placeholder="Product ID" required />
-                <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" />
+                <h2>{formData.productId ? 'Modifier un produit' : 'Ajouter un produit'}</h2>
+                <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Nom" />
                 <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description"></textarea>
-                <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Price" step="0.01" />
+                <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Prix" step="0.01" />
                 <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" />
                 <input type="text" name="collection" value={formData.collection} onChange={handleChange} placeholder="Collection" />
-                <button type="submit">Update Product</button>
+                <button type="submit">{formData.productId ? 'Mettre à jour Produit' : 'Ajouter Produit'}</button>
             </form>
+
+            {/* Liste des produits */}
+            <h2>Liste des produits</h2>
+            <ul>
+                {products.map((product) => (
+                    <li key={product.id}>
+                        <h3>{product.name}</h3>
+                        <p>{product.description}</p>
+                        <p>{product.price}€</p>
+                        <p>Stock: {product.stock}</p>
+                        <p>Collection: {product.collection}</p>
+                        <button onClick={() => setFormData({ ...product })}>Modifier</button>
+                        <button onClick={() => handleDelete(product.id)}>Supprimer</button>
+                    </li>
+                ))}
+            </ul>
+
+            {/* Déconnexion */}
+            <a href="/admin/logout">Déconnexion</a>
         </div>
     );
 }

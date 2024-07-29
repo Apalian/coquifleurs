@@ -5,7 +5,7 @@ function ProductList() {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        fetch('http://yourdomain.com/get_products.php')
+        fetch('http://coquifleurs.lespi.fr/api/get_products.php')
             .then(response => response.json())
             .then(data => setProducts(data));
     }, []);

@@ -1,15 +1,19 @@
-import './App.css';
-import ProductList from "./components/productList";
-import Register from "./components/Register";
-import AddProduct from "./components/AddProduct";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import AdminLogin from './components/AdminLogin';
+import AdminDashboard from './components/AdminDashboard';
+import Home from './components/Home'; // Exemple d'une autre page
+
 function App() {
-  return (
-    <div className="App">
-      <ProductList/>
-      <Register/>
-      <AddProduct/>
-    </div>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/admin" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

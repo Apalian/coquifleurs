@@ -8,7 +8,7 @@ function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('http://coquifleurs.lespi.fr/register.php', {
+        fetch('http://coquifleurs.lespi.fr/api/register.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ username, password, email })

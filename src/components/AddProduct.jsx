@@ -10,7 +10,7 @@ function AddProduct() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('http://coquifleurs.lespi.fr/add_product.php', {
+        fetch('http://coquifleurs.lespi.fr/api/add_product.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ name, description, price, stock, collection })
